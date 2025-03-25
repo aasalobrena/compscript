@@ -33,7 +33,7 @@ function AssignImpl(ctx, activities, persons, jobs, scorers, overwrite, name, av
           return assignment.assignmentCode === 'competitor' || !groupIds.includes(assignment.activityId)
         })
       })
-    } else {
+    }/* else {
       return {
         round: name,
         warnings: ['Jobs are already saved. Not overwriting unless overwrite=true is added.'],
@@ -42,7 +42,7 @@ function AssignImpl(ctx, activities, persons, jobs, scorers, overwrite, name, av
           jobs: {},
         },
       }
-    }
+    } */
   }
 
   var out = {
