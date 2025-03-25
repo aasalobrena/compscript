@@ -49,7 +49,23 @@ class ByFilters {
   }
 }
 
+class PropertyScorer {
+  constructor(filter, score) {
+    this.filter = filter
+    this.score = score
+  }
+
+  getScore(person, group, otherPeople) {
+    if (this.filter({Person: person, Group: group})) {
+      return this.score
+    } else {
+      return 0
+    }
+  }
+}
+
 module.exports = {
   ByMatchingValue: ByMatchingValue,
   ByFilters: ByFilters,
+  PropertyScorer: PropertyScorer,
 }

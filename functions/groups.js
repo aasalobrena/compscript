@@ -146,6 +146,25 @@ const ByFilters = {
   }
 }
 
+const PropertyScorer = {
+  name: 'PropertyScorer',
+  args: [
+    {
+      name: 'filter',
+      type: 'Boolean(Person, Group)',
+      lazy: true,
+    },
+    {
+      name: 'score',
+      type: 'Number',
+    }
+  ],
+  outputType: 'AssignmentScorer',
+  implementation: (filter, score) => {
+    return new scorers.PropertyScorer(filter, score)
+  }
+}
+
 const StationAssignmentRule = {
   name: 'StationAssignmentRule',
   docs: 'A rule to assign people to stations',
@@ -773,7 +792,7 @@ const CheckForMissingGroups = {
 }
 
 module.exports = {
-  functions: [AssignGroups, AssignmentSet, ByMatchingValue, ByFilters, StationAssignmentRule,
+  functions: [AssignGroups, AssignmentSet, ByMatchingValue, ByFilters, PropertyScorer, StationAssignmentRule,
               GroupNumber, Stage, AssignedGroup, AssignedGroups,
               GroupName, StartTime, EndTime, Date,
               RoundStartTime, RoundEndTime,
