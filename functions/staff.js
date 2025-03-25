@@ -491,7 +491,7 @@ const NumJobsInRound = {
 }
 const LengthOfJobs = {
   name: 'LengthOfJobs',
-  docs: 'The number of hours a given person spends working. If type is not provided, all jobs are included.',
+  docs: 'The number of hours a given person spends doing an assignment type. If type is not provided, all jobs are included.',
   args: [
     {
       name: 'person',
@@ -510,7 +510,7 @@ const LengthOfJobs = {
   implementation: (ctx, person, type) => {
     return person.assignments.filter((assignment) => {
       if (type !== null) {
-        return assignment.assignmentCode === 'staff-' + type
+        return assignment.assignmentCode === type
       } else {
         return assignment.assignmentCode.startsWith('staff-')
       }
