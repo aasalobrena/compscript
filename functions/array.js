@@ -69,6 +69,27 @@ const In = {
   },
 }
 
+const InPerson = {
+  name: 'In',
+  docs: 'Returns whether the provided element is in the given array, overloaded for persons.',
+  args: [
+    {
+      name: 'value',
+      type: 'Person',
+      nullable: true,
+      canBeExternal: true,
+    },
+    {
+      name: 'array',
+      type: 'Array<Person>',
+    },
+  ],
+  outputType: 'Boolean',
+  implementation: (value, array) => {
+    return array.some((val) => val === value)
+  }
+}
+
 const InActivityCode = function(type) {
   return {
     name: 'In',
@@ -279,6 +300,6 @@ const Slice = {
 }
 
 module.exports = {
-  functions: [MakeArray, MakeEmptyArray, At, In, InActivityCode('Event'), InActivityCode('Round'), InDateTime,
+  functions: [MakeArray, MakeEmptyArray, At, In, InPerson, InActivityCode('Event'), InActivityCode('Round'), InDateTime,
               Length, Map, Filter, Flatten, Concat, Sort, RandomChoice, Slice],
 }
