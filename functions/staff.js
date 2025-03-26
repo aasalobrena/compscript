@@ -489,9 +489,10 @@ const NumJobsInRound = {
     }).length
   }
 }
+
 const LengthOfJobs = {
   name: 'LengthOfJobs',
-  docs: 'The number of hours a given person spends doing an assignment type. If type is not provided, all jobs are included.',
+  docs: 'The number of hours a given person spends doing an assignments with a certain assignmentCode. If not provided, all jobs are included.',
   args: [
     {
       name: 'person',
@@ -521,6 +522,30 @@ const LengthOfJobs = {
   }
 }
 
+const LengthOfJobsArray = {
+  name: 'LengthOfJobs',
+  docs: 'The number of hours a given person spends doing assignments with the assignmentCodes provided',
+  args: [ 
+    {
+      name: 'person',
+      type: 'Person',
+      canBeExternal: true,
+    },
+    {
+      name: 'assignmentCodes',
+      type: 'Array<String>',
+    }
+  ],
+  outputType: 'Number',
+  usesContext: true,
+  implementation: (ctx, person, types) => {
+    return person.assignments.filter((assignment) => types.includes(assignment.assignmentCode)).map((assignment) => {
+      var group = lib.groupForActivityId(ctx.competition, assignment.activityId)
+      return group.endTime.diff(group.startTime, 'hours').hours
+    }).reduce((total, current) => total + current, 0)
+  }
+}
+
 module.exports = {
   functions: [AssignStaff, AssignMisc, Job,
               JobCountScorer, PriorAssignmentScorer, PreferenceScorer,
@@ -528,5 +553,5 @@ module.exports = {
               SolvingSpeedScorer, GroupScorer, FollowingGroupScorer,
               PersonPropertyScorer, ComputedWeightScorer,
               UnavailableBetween, UnavailableForDate, BeforeTimes, DuringTimes,
-              NumJobs, NumJobsInRound, LengthOfJobs],
+              NumJobs, NumJobsInRound, LengthOfJobs, LengthOfJobsArray],
 }
