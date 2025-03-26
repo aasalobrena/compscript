@@ -56,7 +56,7 @@ function groupForActivityId(competition, activityId) {
   var matching = competition.schedule.venues.map((venue) => venue.rooms).flat()
      .map((room) => {
        return room.activities
-                .map((activity) => activity.childActivities).flat()
+                .map((activity) => [activity, ...activity.childActivities]).flat()
                 .filter((activity) => activity.id == activityId)
                 .map((activity) => [activity, room])
      }).flat()
