@@ -636,7 +636,9 @@ const CreateGroups = function(activityCodeType) {
       }
       var firstStartTime = null;
       var lastEndTime = null;
-      extraMinutesByGroup = [];
+      if (extraMinutesByGroup === "") {
+        extraMinutesByGroup = [];
+      }
       var reservedTime = extraMinutesByGroup.reduce((accumulator, val) => accumulator += val[1], 0)
       var length = (end.diff(start, 'minutes').as('minutes') - reservedTime) / count
       var currentStart = start;
