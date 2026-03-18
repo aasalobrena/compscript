@@ -466,6 +466,20 @@ const RegistrationStatus = {
   implementation: (person) => person.registration.status,
 }
 
+const IsCompeting = {
+  name: 'IsCompeting',
+  docs: 'Returns the registration.isCompeting field in WCIF.',
+  args: [
+    {
+      name: 'person',
+      type: 'Person',
+      canBeExternal: true,
+    }
+  ],
+  outputType: 'Boolean',
+  implementation: (person) => person.registration ? person.registration.isCompeting : false,
+}
+
 const ClearAssignments = {
   name: 'ClearAssignments',
   docs: 'Clears assignments.',
@@ -555,6 +569,6 @@ module.exports = {
       [Name, Birthdate, Age, WcaId, WcaLink, CompetitionGroupsLink, Registered, WcaIdYear, Email, Country, FirstName, LastName,
        Property('Boolean'), Property('String'), Property('Number'), Property('Array<String>'),
        SetProperty, DeleteProperty, HasProperty, AddPerson, Persons,
-       AddRole, DeleteRole, HasRole, RegistrationStatus,
+       AddRole, DeleteRole, HasRole, RegistrationStatus, IsCompeting,
        ClearAssignments, HasResults, IsPossibleNoShow, Gender],
 }

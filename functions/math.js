@@ -197,6 +197,23 @@ const Divide = {
   implementation: (val1, val2) => val1 / val2,
 }
 
+const IntDivide = {
+  name: 'IntDivide',
+  docs: 'Divides two numbers and returns the integer result',
+  args: [
+    {
+      name: 'val1',
+      type: 'Number',
+    },
+    {
+      name: 'val2',
+      type: 'Number',
+    },
+  ],
+  outputType: 'Number',
+  implementation: (val1, val2) => Math.floor(val1 / val2),
+}
+
 const If = {
   name: 'If',
   docs: 'If the condition is true, return the first value, else the second value',
@@ -389,5 +406,5 @@ const Max = {
 module.exports = {
   functions: [GreaterThan, GreaterThanOrEqualTo,
               EqualTo, EqualTo_Date, If, Switch, Switch_Events, Add, ConcatStrings, ConcatArrays, Subtract,
-              Multiply, Divide, Even, Odd, Mod, Min, Max],
+              Multiply, Divide, IntDivide, Even, Odd, Mod, Min, Max],
 }

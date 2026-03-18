@@ -51,6 +51,21 @@ class ByFilters {
   }
 }
 
+class PropertyScorer {
+  constructor(filter, score) {
+    this.filter = filter
+    this.score = score
+  }
+
+  getScore(person, group, otherPeople) {
+    if (this.filter({Person: person, Group: group})) {
+      return this.score
+    } else {
+      return 0
+    }
+  }
+}
+
 class RecentlyCompeted {
   constructor(competition, groupFilter, otherGroupFilter, scoreFn) {
     this.groupFilter = groupFilter
@@ -85,4 +100,5 @@ module.exports = {
   ByMatchingValue: ByMatchingValue,
   ByFilters: ByFilters,
   RecentlyCompeted: RecentlyCompeted,
+  PropertyScorer: PropertyScorer,
 }

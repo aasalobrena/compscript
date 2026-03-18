@@ -146,6 +146,25 @@ const ByFilters = {
   }
 }
 
+const PropertyScorer = {
+  name: 'PropertyScorer',
+  args: [
+    {
+      name: 'filter',
+      type: 'Boolean(Person, Group)',
+      lazy: true,
+    },
+    {
+      name: 'score',
+      type: 'Number',
+    }
+  ],
+  outputType: 'AssignmentScorer',
+  implementation: (filter, score) => {
+    return new scorers.PropertyScorer(filter, score)
+  }
+}
+
 const RecentlyCompeted = {
   name: 'RecentlyCompeted',
   docs: 'Score a person\'s assignment based on how recently they competed',
@@ -680,6 +699,9 @@ const CreateGroups = function(activityCodeType) {
       }
       var firstStartTime = null;
       var lastEndTime = null;
+      if (extraMinutesByGroup === "") {
+        extraMinutesByGroup = [];
+      }
       var reservedTime = extraMinutesByGroup.reduce((accumulator, val) => accumulator += val[1], 0)
       var length = (end.diff(start, 'minutes').as('minutes') - reservedTime) / count
       var currentStart = start;
@@ -819,6 +841,47 @@ const ManuallyAssign = {
   }
 }
 
+const ManuallyAssignActivity = {
+  name: 'ManuallyAssignActivity',
+  docs: 'Manually assign the provided competitors to the provided activity.',
+  args: [
+    {
+      name: 'activityId',
+      type: 'Number',
+    },
+    {
+      name: 'persons',
+      type: 'Array<Person>',
+    },
+    {
+      name: 'assignmentCode',
+      type: 'String',
+      defaultValue: 'competitor',
+    },
+    {
+      name: 'stationNumber',
+      type: 'Number',
+      defaultValue: -1,
+    },
+  ],
+  usesContext: true,
+  outputType: 'String',
+  mutations: ['persons'],
+  implementation: (ctx, activityId, persons, assignmentCode, stationNumber) => {
+    if (!lib.groupForActivityId(ctx.competition, activityId)) {
+      return 'No matching activity found'
+    }
+    persons.forEach((person) => {
+      person.assignments.push({
+        activityId: activityId,
+        stationNumber: stationNumber === -1 ? null : stationNumber,
+        assignmentCode: assignmentCode,
+      })
+    })
+    return 'Assigned ' + persons.length + ' people.'
+  }
+}
+
 const CheckForMissingGroups = {
   name: 'CheckForMissingGroups',
   args: [],
@@ -859,11 +922,11 @@ const CheckForMissingGroups = {
 }
 
 module.exports = {
-  functions: [AssignGroups, AssignmentSet, ByMatchingValue, ByFilters, RecentlyCompeted, StationAssignmentRule,
+  functions: [AssignGroups, AssignmentSet, ByMatchingValue, ByFilters, PropertyScorer, RecentlyCompeted, StationAssignmentRule,
               GroupNumber, Stage, Room, AssignedGroup, AssignedGroups,
               GroupName, StartTime, EndTime, Date,
               RoundStartTime, RoundEndTime, Overlaps,
               AssignmentAtTime, Code, Group, GroupForActivityId, Round, Event, Groups, AllGroups,
-              CreateGroups('Round'), CreateGroups('Attempt'), ManuallyAssign,
+              CreateGroups('Round'), CreateGroups('Attempt'), ManuallyAssign, ManuallyAssignActivity,
               CheckForMissingGroups],
 }
