@@ -23,7 +23,7 @@ function Assign(competition, round, assignmentSets, scorers, stationRules, attem
     } else {
       competition.persons.forEach((person) => {
         person.assignments = person.assignments.filter(
-            (assignment) => !activityIds.includes(assignment.activityId) || assignment.code !== 'competitor')
+            (assignment) => !activityIds.includes(assignment.activityId))
       })
     }
   }
