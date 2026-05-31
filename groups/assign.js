@@ -252,18 +252,47 @@ function constructModel(queue, groupsToUse, scorers, assignmentsByGroup, current
 function assignStations(stationRules, groups, assignmentsByGroup, assignmentsByPerson) {
   stationRules.forEach((rule) => {
     groups.filter((group) => rule.groupFilter({Group: group})).forEach((group) => {
-      assignmentsByGroup[group.wcif.id].sort((a1, a2) => {
-        switch (rule.mode) {
-          case "ascending":
-            return rule.sortKey({Person: a1.person}) < rule.sortKey({Person: a2.person}) ? -1 : 1
-          case "descending":
-            return rule.sortKey({Person: a2.person}) < rule.sortKey({Person: a1.person}) ? 1 : -1
-          case "arbitrary":
-            return Math.random() - 0.5
+      var model = {
+        optimize: 'score',
+        opType: 'max',
+        constraints: {},
+        variables: {},
+        ints: {},
+      }
+      var numStations = assignmentsByGroup[group.wcif.id].length
+      assignmentsByGroup[group.wcif.id].forEach((a) => {
+        var score = +rule.sortKey({Person: a.person})
+        var personKey = a.person.wcaUserId.toString()
+        for (let i = 1; i <= numStations; i++) {
+          var stationKey = 's' + i.toString()
+          var key = personKey + '-' + stationKey
+          model.variables[key] = {
+            score: score * ((rule.mode == 'ascending') ? i : (numStations + 1 - i))
+          }
+          model.variables[key][personKey] = 1
+          model.variables[key][stationKey] = 1
+          model.variables[key][key] = 1
+          model.constraints[key] = {min: 0, max: 1}
+          model.ints[key] = 1
         }
-      }).forEach((assignment, idx) => {
-        assignmentsByPerson[assignment.person.wcaUserId].stationNumber = idx + 1
-        assignment.stationNumber = idx + 1
+        model.constraints[personKey] = {min: 1, max: 1}
+      })
+      for (let i = 1; i <= numStations; i++) {
+        var stationKey = 's' + i.toString()
+        model.constraints[stationKey] = {min: 1, max: 1}
+      }
+      var solution = solver.Solve(model)
+      assignmentsByGroup[group.wcif.id].forEach((a) => {
+        var score = rule.sortKey({Person: a.person})
+        var personKey = a.person.wcaUserId.toString()
+        for (let i = 1; i <= numStations; i++) {
+          var stationKey = 's' + i.toString()
+          var key = personKey + '-' + stationKey
+          if (key in solution && solution[key] == 1) {
+            assignmentsByPerson[a.person.wcaUserId].stationNumber = i
+            a.stationNumber = i
+          }
+        }
       })
     })
   })
