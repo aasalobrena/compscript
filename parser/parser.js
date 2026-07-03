@@ -34,16 +34,21 @@ async function parse(text, req, res, ctx, allowParams) {
   } catch (err) {
     console.log(err)
     console.log(util.inspect(err.expected, {depth: null}))
+    var lines = text.split('\n')
+    var errorData = {
+      line: lines[err.location.start.line - 1],
+      location: err.location
+    }
+    if (err.location.start.line > 1) {
+      errorData.previousLine = lines[err.location.start.line - 2]
+    }
+    if (err.location.start.line < lines.length) {
+      errorData.nextLine = lines[err.location.start.line]
+    }
     var line = text.split('\n')[err.location.start.line - 1]
     out.outputs.push({
       type: 'Error',
-      data: {
-        type: 'InputParseError',
-        data: {
-          line: line,
-          location: err.location,
-        }
-      }
+      data: errorData,
     })
     return out
   }
