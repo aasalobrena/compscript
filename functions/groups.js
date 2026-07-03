@@ -199,10 +199,38 @@ const StationAssignmentRule = {
       defaultValue: 0,
       docs: 'If "mode" is either "ascending" or "descending", the sort key to use',
     },
+    {
+      name: 'stationExclusionRules',
+      type: 'Array<StationExclusionRule>',
+      defaultValue: [],
+    }
   ],
   outputType: 'StationAssignmentRule',
-  implementation: (groupFilter, mode, sortKey) => {
-    return new assign.StationAssignmentRule(groupFilter, mode, sortKey)
+  implementation: (groupFilter, mode, sortKey, stationExclusionRules) => {
+    return new assign.StationAssignmentRule(groupFilter, mode, sortKey, stationExclusionRules)
+  }
+}
+
+const StationExclusionRule = {
+  name: 'StationExclusionRule',
+  docs: 'Conditions under which a person cannot be assigned to a station',
+  args: [
+    {
+      name: 'personFilter',
+      type: 'Boolean(Person)',
+      lazy: true,
+      docs: 'The people to whom this applies',
+    },
+    {
+      name: 'stationFilter',
+      type: 'Boolean(Number)',
+      lazy: true,
+      docs: 'The station numbers to which this applies',
+    },
+  ],
+  outputType: 'StationExclusionRule',
+  implementation: (personFilter, stationFilter) => {
+    return {personFilter, stationFilter}
   }
 }
 
@@ -532,6 +560,20 @@ const Event = {
   implementation: (group) => group.activityCode.group(null).round(null),
 }
 
+const AttemptNumber = {
+  name: 'AttemptNumber',
+  docs: 'The attempt number for a Group',
+  args: [
+    {
+      name: 'group',
+      type: 'Group',
+      canBeExternal: true,
+    }
+  ],
+  outputType: 'Number',
+  implementation: (group) => group.activityCode.attemptNumber,
+}
+
 const Groups = {
   name: 'Groups',
   docs: 'All groups in a round',
@@ -772,12 +814,17 @@ const ManuallyAssign = {
       type: 'Number',
       nullable: true,
       defaultValue: null,
+    },
+    {
+      name: 'featured',
+      type: 'Boolean',
+      defaultValue: 'false',
     }
   ],
   usesContext: true,
   outputType: 'String',
   mutations: ['persons'],
-  implementation: (ctx, persons, round, roomOrStage, number, assignmentCode, stationNumber) => {
+  implementation: (ctx, persons, round, roomOrStage, number, assignmentCode, stationNumber, featured) => {
     var groupsForRound = lib.groupsForRoundCode(ctx.competition, round)
     var groups = groupsForRound.filter((group) => {
       return group.room.name === roomOrStage && group.activityCode.groupNumber === number
@@ -803,8 +850,13 @@ const ManuallyAssign = {
         return 'No matching groups found'
       }
     }
+    if (featured) {
+      var ext = extension.getOrInsertExtension(groups[0].wcif, 'ActivityConfig', 'groupifier')
+      ext.featuredCompetitorWcaUserIds.push(persons.map((person) => person.wcaUserId))
+    }
     persons.forEach((person) => {
       if (assignmentCode == "competitor") {
+        // TODO: We should also remove them from featuredCompetitorWcaUserIds in the old group.
         person.assignments = person.assignments.filter((assignment) => {
           return !groupsForRound.map((group) => group.wcif.id).includes(assignment.activityId)
         })
@@ -859,9 +911,10 @@ const CheckForMissingGroups = {
 }
 
 module.exports = {
-  functions: [AssignGroups, AssignmentSet, ByMatchingValue, ByFilters, RecentlyCompeted, StationAssignmentRule,
+  functions: [AssignGroups, AssignmentSet, ByMatchingValue, ByFilters, RecentlyCompeted,
+              StationAssignmentRule, StationExclusionRule,
               GroupNumber, Stage, Room, AssignedGroup, AssignedGroups,
-              GroupName, StartTime, EndTime, Date,
+              GroupName, StartTime, EndTime, Date, AttemptNumber,
               RoundStartTime, RoundEndTime, Overlaps,
               AssignmentAtTime, Code, Group, GroupForActivityId, Round, Event, Groups, AllGroups,
               CreateGroups('Round'), CreateGroups('Attempt'), ManuallyAssign,
