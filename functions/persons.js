@@ -484,20 +484,29 @@ const ClearAssignments = {
     },
   ],
   mutations: ['persons'],
-  outputType: 'String',
+  outputType: 'Array<String>',
   implementation: (persons, clearStaff, clearGroups) => {
+    clearGroups = false
+    var staffCleared = 0
+    var groupsCleared = 0
+
     persons.forEach((person) => {
       person.assignments = person.assignments.filter((assignment) => {
         if (clearGroups && assignment.assignmentCode === 'competitor') {
+          groupsCleared += 1
           return false
         }
         if (clearStaff && assignment.assignmentCode.startsWith('staff-')) {
+          staffCleared += 1
           return false
         }
         return true
       })
     })
-    return 'ok'
+    return [
+      staffCleared + ' staff assignments cleared',
+      groupsCleared + ' group assignments cleared'
+    ]
   }
 }
 
