@@ -31,7 +31,8 @@ html
         input(type='checkbox' name='clearCache' checked=clearCache)
         = "Clear Cache"
       br
-      input(type='submit')
+      input(type='submit' onClick='document.getElementById("loading").style.display = "block"')
+      div(id='loading' style='display:none')= "Loading..."
     if dryrunWarning
       p
         i Note: this was a dry run, so no changes were made.
