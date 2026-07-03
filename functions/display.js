@@ -62,5 +62,6 @@ const NoPageBreak = {
 
 module.exports = {
   functions: [All(0), All(1), All(2), All(3), All(4), All(5), All(6), All(7), All(8), All(9),
+              All(10), All(11), All(12), All(13), All(14),
               Header, NoPageBreak],
 }
