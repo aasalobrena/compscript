@@ -289,6 +289,38 @@ const Switch_Events = {
   }
 }
 
+const Switch_Date = {
+  name: 'Switch',
+  docs: 'Returns the first matching value',
+  genericParams: ['U'],
+  args: [
+    {
+      name: 'value',
+      type: 'Date',
+      canBeExternal: true,
+    },
+    {
+      name: 'options',
+      type: 'Array<Tuple<Date, $U>>',
+    },
+    {
+      name: 'defaultValue',
+      type: '$U',
+      defaultValue: null,
+      nullable: true,
+    },
+  ],
+  outputType: '$U',
+  implementation: (value, options, defaultValue) => {
+    for (const option of options) {
+      if(option[0].year === value.year && option[0].month === value.month && option[0].day === value.day) {
+        return option[1]
+      }
+    }
+    return defaultValue
+  }
+}
+
 const Even = {
   name: 'Even',
   docs: 'Returns true if the number is even',
@@ -388,6 +420,6 @@ const Max = {
 
 module.exports = {
   functions: [GreaterThan, GreaterThanOrEqualTo,
-              EqualTo, EqualTo_Date, If, Switch, Switch_Events, Add, ConcatStrings, ConcatArrays, Subtract,
+              EqualTo, EqualTo_Date, If, Switch, Switch_Events, Switch_Date, Add, ConcatStrings, ConcatArrays, Subtract,
               Multiply, Divide, Even, Odd, Mod, Min, Max],
 }
