@@ -871,6 +871,45 @@ const ManuallyAssign = {
   }
 }
 
+const ManuallyAssignActivity = {
+  name: 'ManuallyAssignActivity',
+  docs: 'Manually assign the provided competitors to the provided activity.',
+  args: [
+    {
+      name: 'activityId',
+      type: 'Number',
+    },
+    {
+      name: 'persons',
+      type: 'Array<Person>',
+    },
+    {
+      name: 'assignmentCode',
+      type: 'String',
+      defaultValue: 'competitor',
+    },
+    {
+      name: 'stationNumber',
+      type: 'Number',
+      nullable: true,
+      defaultValue: null,
+    },
+  ],
+  usesContext: true,
+  outputType: 'String',
+  mutations: ['persons'],
+  implementation: (ctx, activityId, persons, assignmentCode, stationNumber) => {
+    persons.forEach((person) => {
+      person.assignments.push({
+        activityId,
+        stationNumber,
+        assignmentCode,
+      })
+    })
+    return 'Assigned ' + persons.length + ' people.'
+  }
+}
+
 const CheckForMissingGroups = {
   name: 'CheckForMissingGroups',
   args: [],
@@ -917,6 +956,6 @@ module.exports = {
               GroupName, StartTime, EndTime, Date, AttemptNumber,
               RoundStartTime, RoundEndTime, Overlaps,
               AssignmentAtTime, Code, Group, GroupForActivityId, Round, Event, Groups, AllGroups,
-              CreateGroups('Round'), CreateGroups('Attempt'), ManuallyAssign,
+              CreateGroups('Round'), CreateGroups('Attempt'), ManuallyAssign, ManuallyAssignActivity,
               CheckForMissingGroups],
 }
