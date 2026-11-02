@@ -39,6 +39,25 @@ const At = {
   }
 }
 
+const Index = {
+  name: 'Index',
+  genericParams: ['T'],
+  docs: 'Returns the 0-index of the provided element from the provided array.',
+  args: [
+    {
+      name: 'array',
+      type: 'Array<$T>',
+    },
+    {
+      name: 'value',
+      type: '$T',
+      canBeExternal: true,
+    }
+  ],
+  outputType: 'Number',
+  implementation: (array, value) => array.indexOf(value)
+}
+
 const MakeEmptyArray = {
   name: 'MakeEmptyArray',
   docs: 'Constructs an array containing zero elements. Can be invoked as a literal expression via [].',
@@ -279,6 +298,6 @@ const Slice = {
 }
 
 module.exports = {
-  functions: [MakeArray, MakeEmptyArray, At, In, InActivityCode('Event'), InActivityCode('Round'), InDateTime,
+  functions: [MakeArray, MakeEmptyArray, At, Index, In, InActivityCode('Event'), InActivityCode('Round'), InDateTime,
               Length, Map, Filter, Flatten, Concat, Sort, RandomChoice, Slice],
 }
